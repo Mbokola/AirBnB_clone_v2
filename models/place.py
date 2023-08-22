@@ -1,11 +1,14 @@
 #!/usr/bin/python3
 """ Place Module for HBNB project """
-from models.base_model import BaseModel
+from models.base_model import BaseModel, Base
+from sqlAlchemy import Column, String, Integer
 
 
-class Place(BaseModel):
+class Place(BaseModel, Base):
     """ A place to stay """
-    city_id = ""
+    __tablename__  'places'
+
+    city_id = Column(String(60), nullable=False)
     user_id = ""
     name = ""
     description = ""
