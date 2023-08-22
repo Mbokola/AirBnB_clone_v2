@@ -26,11 +26,9 @@ class BaseModel:
                     value = datetime.strptime(value, "%Y-%m-%dT%H:%M:%S.%f")
                 if key != "__class__":
                     setattr(self, key, value)
-
     def __str__(self):
-        """Returns a string representation of the instance"""
-        cls = (str(type(self)).split('.')[-1]).split('\'')[0]
-        return '[{}] ({}) {}'.format(cls, self.id, self.__dict__)
+        dic = self.to_dict()
+        return "[{}] ({}) {}".format(type(self).__name__, self.id, dic)
 
     def save(self):
         """Updates updated_at with current time when instance is changed"""
