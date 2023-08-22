@@ -26,6 +26,7 @@ class BaseModel:
                     value = datetime.strptime(value, "%Y-%m-%dT%H:%M:%S.%f")
                 if key != "__class__":
                     setattr(self, key, value)
+
     def __str__(self):
         dic = self.to_dict()
         return "[{}] ({}) {}".format(type(self).__name__, self.id, dic)
