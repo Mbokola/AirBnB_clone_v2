@@ -41,7 +41,7 @@ class db_storage:
         if cls:
             classes = [cls]
         else:
-            classes = [State]
+            classes = [User]
 
         objs = {}
         for cls in classes:
