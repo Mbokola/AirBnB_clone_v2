@@ -12,6 +12,7 @@ from models.review import Review
 from models.place import Place
 from models.amenity import Amenity
 
+
 class db_storage:
     """ The databsaw storage engine """
 
@@ -41,7 +42,7 @@ class db_storage:
         if cls:
             classes = [cls]
         else:
-            classes = [State]
+            classes = [State, City]
 
         objs = {}
         for cls in classes:
