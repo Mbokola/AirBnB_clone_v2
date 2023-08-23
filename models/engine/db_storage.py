@@ -42,7 +42,7 @@ class db_storage:
         if cls:
             classes = [cls]
         else:
-            classes = [State, City]
+            classes = [State, City, User, Review, Place, Amenity]
 
         objs = {}
         for cls in classes:
