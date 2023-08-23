@@ -42,13 +42,13 @@ class db_storage:
         if cls:
             classes = [cls]
         else:
-            classes = [State, City, User, Review, Place, Amenity]
+            classes = [State, City, User, Review, Place]
 
         objs = {}
-        for cls in classes:
-            query_obj = self.__session.query(cls).all()
+        for cls_obj in classes:
+            query_obj = self.__session.query(cls_obj).all()
             for obj in query_obj:
-                key = f"{cls.__name__}.{obj.id}"
+                key = f"{cls_obj.__name__}.{obj.id}"
                 objs[key] = obj
         return objs
 
