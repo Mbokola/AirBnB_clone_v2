@@ -11,6 +11,16 @@ from models.amenity import Amenity
 from models.review import Review
 from os import getenv
 
+place_amenity_association = Table('place_amenity', Base.metadata,
+                                  Column('place_id', String(60),
+                                         ForeignKey('places.id'),
+                                         primary_key=True,
+                                         nullable=False),
+                                  Column("amenity_id", String(60),
+                                         ForeignKey("amenities.id"),
+                                         primary_key=True,
+                                         nullable=False))
+
 
 class Place(BaseModel, Base):
     """This is the class for Place
@@ -27,7 +37,9 @@ class Place(BaseModel, Base):
     latitude = Column(Float, nullable=True)
     longitude = Column(Float, nullable=True)
     amenity_ids = []
-
+    amenities = relationship("Amenity", secondary="place_amenity",
+                             viewonly=False)
+    amenity_ids = []
     if getenv("HBNB_TYPE_STORAGE") == "db":
         reviews = relationship('Review', backref='place',
                                cascade='all, delete-orphan')
@@ -37,3 +49,14 @@ class Place(BaseModel, Base):
             """Getter attribute for file storage"""
             return [review for review in models.storage.all(Review)
                     if review.place_id == self.id]
+
+    @property
+    def amenities(self):
+        """ Amenity getter from file storage """
+        return [amenity for amenity in models.storage.all(Amenity).values()
+                if amenity.id in self.amenity_ids]
+
+    @amenities.setter
+    def amenities(self, value):
+        if type(value) == Amenity:
+            self.amenity_ids.append(value.id)
