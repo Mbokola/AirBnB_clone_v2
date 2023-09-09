@@ -20,7 +20,7 @@ def do_deploy(archive_path):
 
         # Extract archive to /data/web_static/releases/
         filename = archive_path.split('/')[-1]
-        folder_name = filename.replace('.tgz', '')
+        folder_name = filename.split('.')[0]
         release_path = f'/data/web_static/releases/{folder_name}/'
         sudo(f'mkdir -p {release_path}')
         sudo(f'tar -xzf /tmp/{filename} -C {release_path}')
