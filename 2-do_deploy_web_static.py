@@ -3,6 +3,7 @@
 
 from fabric.api import env, put, sudo
 from os.path import exists
+do_pack = __import__('1-pack_web_static').do_pack
 
 env.hosts = ['100.26.231.64', '107.23.16.147']
 
