@@ -47,11 +47,3 @@ def do_deploy(archive_path):
         return True
     except Exception:
         return False
-
-
-if __name__ == "__main__":
-    result = do_deploy()
-    if not result:
-        print("Failed")
-    else:
-        print("Succesful")
