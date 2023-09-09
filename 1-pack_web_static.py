@@ -1,3 +1,6 @@
+#!/usr/bin/python3
+""" 1-pack_web_static module """
+
 from fabric.api import local
 from datetime import datetime
 
