@@ -33,7 +33,7 @@ fi
 
 ln -sf /data/web_static/releases/test /data/web_static/current
 
-sudo chown -R ubuntu:ubuntu /data/
+chown -R ubuntu:ubuntu /data/
 
 if [ ! -f "/etc/nginx/sites-available/default.bak" ]; then
     cp "/etc/nginx/sites-available/default" "/etc/nginx/sites-available/default.bak"
@@ -41,7 +41,7 @@ else
     cp "/etc/nginx/sites-available/default.bak" "/etc/nginx/sites-available/default"
 fi
 
-sudo sed -i '/server_name _;/a \\n        location /hbnb_static/ {\n            alias /data/web_static/current/;\n        }' /etc/nginx/sites-available/default
+sed -i '/server_name _;/a \\n        location /hbnb_static/ {\n            alias /data/web_static/current/;\n        }' /etc/nginx/sites-available/default
 
 service nginx restart
 exit 0
