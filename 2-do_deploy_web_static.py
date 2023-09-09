@@ -15,6 +15,8 @@ def do_deploy(archive_path):
         return False
 
     try:
+        sudo('mkdir -p /data/web_static/shared/')
+        sudo('mkdir -p /data/web_static/releases/test/')
         # Upload the archive to /tmp/ on the web servers
         put(archive_path, '/tmp/')
         # Extract archive to /data/web_static/releases/
