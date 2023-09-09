@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 """ 2-do_deploy_web_static """
 
-from fabric.api import env, put, run, local
+from fabric.api import env, put, sudo
 from os.path import exists
 
 env.hosts = ['100.26.231.64', '107.23.16.147']  # Replace with your server IPs
@@ -24,25 +24,25 @@ def do_deploy(archive_path):
         folder_name = filename.replace('.tgz', '')
         release_path = f'/data/web_static/releases/{folder_name}/'
         print("Creating directory")
-        run(f'mkdir -p {release_path}')
+        sudo(f'mkdir -p {release_path}')
         print("Extracting file")
-        run(f'tar -xzf /tmp/{filename} -C {release_path}')
+        sudo(f'tar -xzf /tmp/{filename} -C {release_path}')
 
         # Delete the archive from /tmp/
         print("Deleting /tmp/")
-        run(f'rm /tmp/{filename}')
-
-        run(f"mv /data/web_static/releases/{folder_name}/web_static/* /data\
+        sudo(f'rm /tmp/{filename}')
+        # Move to serving directory
+        sudo(f"mv /data/web_static/releases/{folder_name}/web_static/* /data\
 /web_static/releases/{folder_name}/")
-        run(f"rm -rf /data/web_static/releases/{folder_name}/web_static")
+        sudo(f"rm -rf /data/web_static/releases/{folder_name}/web_static")
         # Delete the current symbolic link
         print("Deleting symlink")
         current_link = '/data/web_static/current'
-        run(f'rm -f {current_link}')
+        sudo(f'rm -f {current_link}')
 
         # Create a new symbolic link
         print("Creatimg symlink")
-        run(f'ln -s {release_path} {current_link}')
+        sudo(f'ln -s {release_path} {current_link}')
 
         return True
     except Exception:
