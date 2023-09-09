@@ -4,8 +4,8 @@
 from fabric.api import env, put, sudo
 from os.path import exists
 
-env.hosts = ['100.26.231.64', '107.23.16.147']  # Replace with your server IPs
-env.user = 'ubuntu'  # Replace with your SSH username
+env.hosts = ['100.26.231.64', '107.23.16.147']
+env.user = 'ubuntu'
 
 
 def do_deploy(archive_path):
