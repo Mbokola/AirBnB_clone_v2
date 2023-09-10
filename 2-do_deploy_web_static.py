@@ -1,68 +1,63 @@
 #!/usr/bin/python3
-"""A fabric configuration module to manage static web deployment
+""" 2-do_deploy_web_static """
 
-This module contain
-    function:
-    do_pack: that bundles and compresses all content of the
-            web_static to  version folder
-    do_deploy: that takes a parameter 'archive_path' which is the
-            location of the archive file
-"""
-import os
-import fabric.api as api
-from datetime import datetime
-from pathlib import Path
+from fabric.api import env, put, sudo
+from os.path import exists
 
-api.env.hosts = ['107.23.16.147', '100.26.231.64']
+env.hosts = ['100.26.231.64', '107.23.16.147']
 
 
 def do_pack():
-    """Bundles convert the contents of web_static directory to tgz
     """
-    version_dir = Path('./versions')
-    if not version_dir.exists():
-        os.mkdir(version_dir)
-    now = datetime.now()
-
-    # absolute path to the compressed file
-    file_name = version_dir / "web_static_{}{}{}{}{}{}.tgz".format(
-            now.year, now.month, now.day,
-            now.hour, now.minute, now.second)
+    Create a .tgz archive from the web_static folder.
+    """
     try:
-        api.local(f"tar -zcvf {file_name.absolute()} -C web_static .")
-        return str(file_name.absolute())
+        # Create the 'versions' directory if it doesn't exist
+        local("mkdir -p versions")
+
+        # Generate the archive name using the current date and time
+        now = datetime.now()
+        archive_name = f"web_static_{now.strftime('%Y%m%d%H%M%S')}.tgz"
+
+        # Use the tar command to create the .tgz archive
+        local(f"tar -czvf versions/{archive_name} web_static")
+
+        # Return the archive path if successful
+        return f"versions/{archive_name}"
     except Exception:
         return None
 
 
 def do_deploy(archive_path):
-    """Deploys archive path to production
     """
-    if not Path(archive_path).exists():
+    Distribute the archive to web servers and perform deployment.
+    """
+    if not exists(archive_path):
         return False
+
     try:
-        file_name = archive_path.split('/')[-1]
-        file_name_no_ext = file_name.split('.')[0]
-        old_path = '/data/web_static/releases/{}/web_static'.format(
-                file_name_no_ext)
-        new_path = '/data/web_static/releases/{}'.format(
-                file_name_no_ext)
-        curr_path = '/data/web_static/current'
+        # Upload the archive to /tmp/ on the web servers
+        put(archive_path, '/tmp/')
+        # Extract archive to /data/web_static/releases/
+        filename = archive_path.split('/')[-1]
+        folder_name = filename.split('.')[0]
+        release_path = f'/data/web_static/releases/{folder_name}/'
+        sudo(f'mkdir -p {release_path}')
+        sudo(f'tar -xzf /tmp/{filename} -C {release_path}')
 
-        run_locally = os.getenv("run_locally", None)
-        if run_locally is None:
-            api.local(f'mkdir -p {new_path}')
-            api.local(f'tar -zxf {archive_path} -C {new_path}')
-            api.local(f'rm -rfR {curr_path}')
-            api.local(f'ln -s {new_path} {curr_path}')
-            os.environ['run_locally'] = "True"
+        # Delete the archive from /tmp/
+        sudo(f'rm /tmp/{filename}')
+        # Move to serving directory
+        sudo(f"mv /data/web_static/releases/{folder_name}/web_static/* /data\
+/web_static/releases/{folder_name}/")
+        sudo(f"rm -rf /data/web_static/releases/{folder_name}/web_static")
+        # Delete the current symbolic link
+        current_link = '/data/web_static/current'
+        sudo(f'rm -f {current_link}')
 
-        api.put(archive_path, '/tmp/')
-        api.run(f'mkdir -p {new_path}')
-        api.run(f'tar -zxf /tmp/{file_name} -C {new_path}')
-        api.run(f'rm /tmp/{file_name}')
-        api.run(f'rm -rfR {curr_path}')
-        api.run(f'ln -s {new_path} {curr_path}')
+        # Create a new symbolic link
+        sudo(f'ln -s {release_path} {current_link}')
+
         return True
     except Exception:
         return False
