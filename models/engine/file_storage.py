@@ -60,3 +60,10 @@ class FileStorage:
             to_del = f"{type(obj).__name__}.{obj.id}"
             if to_del in self.__objects:
                 del self.__objects[to_del]
+
+    def close(self):
+        """
+        calls reload() method for deserializing the JSON file to objects
+        """
+
+        self.reload()
